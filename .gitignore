@@ -1,0 +1,15 @@
+node_modules/
+dist/
+
+# Terraform
+infra/.terraform/
+infra/.build/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# tflocal injects this file temporarily during apply — never commit it
+localstack_providers_override.tf
+
+# OS
+.DS_Store

@@ -1,0 +1,18 @@
+services:
+  localstack:
+    image: localstack/localstack:3.8.0
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=lambda,iam,logs
+      - DEBUG=0
+      # Required for Rancher Desktop and Colima.
+      # Safe to keep on Docker Desktop too.
+      - LAMBDA_DOCKER_FLAGS=-e LOCALSTACK_FILE_WATCHER_STRATEGY=polling
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      # LocalStack spawns a child container per Lambda invoke and mounts this
+      # path from the HOST directly. Both sides must be the same absolute path.
+      # Set HOST_DIST_PATH before `docker compose up`:
+      #   export HOST_DIST_PATH="$(pwd)/dist"
+      - "${HOST_DIST_PATH}:${HOST_DIST_PATH}"
