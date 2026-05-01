@@ -1,6 +1,6 @@
-# TypeScript Lambda hot-reload with Terraform and LocalStack
+# Local Lambda development with TypeScript + Terraform using LocalStack hot-reload
 
-Sub-second Lambda iteration cycles using the same Terraform config that deploys to production.
+Develop TypeScript Lambdas locally without redeploying — one Terraform config for local and prod.
 
 No second config file. No manual `aws lambda update-function-code`. No re-running `tflocal apply` on every edit.
 
