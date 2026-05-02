@@ -6,6 +6,14 @@ for cmd in docker node npm awslocal tflocal; do
   command -v "$cmd" &>/dev/null || { echo "Error: $cmd not found." >&2; exit 1; }
 done
 
+if [ -z "${LOCALSTACK_AUTH_TOKEN:-}" ]; then
+  echo "LOCALSTACK_AUTH_TOKEN is not set."
+  echo "Get your free token at https://app.localstack.cloud (Hobby plan)"
+  printf "Paste your token: "
+  read -r LOCALSTACK_AUTH_TOKEN
+  export LOCALSTACK_AUTH_TOKEN
+fi
+
 export HOST_DIST_PATH="$(pwd)/dist"
 
 echo "▶ Installing Node dependencies..."

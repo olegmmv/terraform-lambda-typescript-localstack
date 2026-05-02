@@ -1,6 +1,6 @@
-# Local Lambda development with TypeScript + Terraform using LocalStack hot-reload
+# TypeScript Lambda hot-reload with Terraform and LocalStack
 
-Develop TypeScript Lambdas locally without redeploying — one Terraform config for local and prod.
+Sub-second Lambda iteration cycles using the same Terraform config that deploys to production.
 
 No second config file. No manual `aws lambda update-function-code`. No re-running `tflocal apply` on every edit.
 
@@ -31,13 +31,14 @@ The same `main.tf` works for real AWS — switch `stage=prod` and it deploys a z
 
 ## Prerequisites
 
-| Tool                        | Install                                                                           |
-| --------------------------- | --------------------------------------------------------------------------------- |
-| Docker                      | [docker.com](https://www.docker.com/)                                             |
-| Node.js 20+                 | [nodejs.org](https://nodejs.org/)                                                 |
-| Terraform ≥ 1.5 or OpenTofu | [terraform.io](https://www.terraform.io/) / [opentofu.org](https://opentofu.org/) |
-| `awslocal`                  | `pip install awscli-local`                                                        |
-| `tflocal`                   | `pip install terraform-local`                                                     |
+| Tool                        | Install                                                                                                                               |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Docker                      | [docker.com](https://www.docker.com/)                                                                                                 |
+| Node.js 20+                 | [nodejs.org](https://nodejs.org/)                                                                                                     |
+| Terraform ≥ 1.5 or OpenTofu | [terraform.io](https://www.terraform.io/) / [opentofu.org](https://opentofu.org/)                                                     |
+| `awslocal`                  | `pip install awscli-local`                                                                                                            |
+| `tflocal`                   | `pip install terraform-local`                                                                                                         |
+| LocalStack account          | Free [Hobby plan](https://www.localstack.cloud/pricing) — get your auth token at [app.localstack.cloud](https://app.localstack.cloud) |
 
 ---
 
@@ -56,8 +57,9 @@ Or step by step:
 npm install
 npm run build
 
-# 2. Export the host path — must be set before docker compose up
+# 2. Set environment variables
 export HOST_DIST_PATH="$(pwd)/dist"
+export LOCALSTACK_AUTH_TOKEN="your-token-here"  # from app.localstack.cloud
 
 # 3. Start LocalStack
 docker compose up -d
@@ -88,6 +90,9 @@ npm run logs
 > `lambda_mount_path` from the **host** filesystem directly — not from inside the
 > LocalStack container. So the path must be a real path on your machine, and it must
 > be the same in both the `docker-compose.yml` volume and the `lambda_mount_path` variable.
+>
+> **`LOCALSTACK_AUTH_TOKEN`** is required since LocalStack 2026.03.0.
+> Get yours free at [app.localstack.cloud](https://app.localstack.cloud) (Hobby plan, non-commercial use).
 
 ---
 
@@ -112,6 +117,7 @@ will fail with `mounts denied`.
 
 ```bash
 export HOST_DIST_PATH="$(pwd)/dist"
+export LOCALSTACK_AUTH_TOKEN="your-token-here"
 docker compose up -d
 cd infra
 TF_CMD=tofu tflocal apply -auto-approve \
@@ -153,22 +159,17 @@ tflocal apply -state=local.tfstate \
 
 ---
 
-## What works on LocalStack Community (free)
+## What works on LocalStack Hobby plan (free)
 
-| Feature                | Community | Pro         |
-| ---------------------- | --------- | ----------- |
-| Lambda execution       | ✅        | ✅          |
-| Hot-reload             | ✅        | ✅          |
-| API Gateway v1 / v2    | ✅        | ✅          |
-| CloudWatch Logs        | ✅        | ✅          |
-| S3, DynamoDB, SQS, SNS | ✅        | ✅          |
-| Lambda Layers          | ❌        | ✅          |
-| IAM enforcement        | ❌        | ✅ (opt-in) |
-| AppSync, MSK, Glue     | ❌        | ✅          |
+Everything in this repository runs on the free [Hobby plan](https://www.localstack.cloud/pricing) (non-commercial use, requires auth token).
 
-> IAM is **not enforced** in Community. A Lambda that passes locally may fail in AWS due to missing permissions. Always validate IAM policies against real AWS or LocalStack Pro.
->
-> Based on [LocalStack 3.8.0 documentation](https://docs.localstack.cloud/aws/services/). Lambda execution, hot-reload, and CloudWatch Logs verified with this repository. Other services listed per docs.
+Verified with this repository:
+
+- Lambda execution + hot-reload
+- CloudWatch Logs
+- IAM roles (created, but **not enforced** — a Lambda that passes locally may fail in AWS due to missing permissions)
+
+The Hobby plan includes 30+ emulated AWS services. For the full list by plan, see [Emulated Services](https://docs.localstack.cloud/aws/licensing/).
 
 ---
 

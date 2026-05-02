@@ -1,13 +1,11 @@
 services:
   localstack:
-    image: localstack/localstack:3.8.0
+    image: localstack/localstack:latest
     ports:
       - "4566:4566"
     environment:
-      - SERVICES=lambda,iam,logs
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN}
       - DEBUG=0
-      # Required for Rancher Desktop and Colima.
-      # Safe to keep on Docker Desktop too.
       - LAMBDA_DOCKER_FLAGS=-e LOCALSTACK_FILE_WATCHER_STRATEGY=polling
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
