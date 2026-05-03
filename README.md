@@ -120,6 +120,7 @@ export HOST_DIST_PATH="$(pwd)/dist"
 export LOCALSTACK_AUTH_TOKEN="your-token-here"
 docker compose up -d
 cd infra
+TF_CMD=tofu tflocal init
 TF_CMD=tofu tflocal apply -auto-approve \
   -var="stage=local" \
   -var="lambda_mount_path=${HOST_DIST_PATH}"
